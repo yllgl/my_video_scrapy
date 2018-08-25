@@ -14,7 +14,7 @@ in the **setting.py**  , you can change the **TEMP_PATH** which stores temporary
 
 the spider name is **youtube_dl** , so you need use **scrapy crawl youtube_dl** to start the spider.
 
-Remember to change the **start_urls** in **youtube_d_spider.py** so you crawl what you want.
+Remember to change the **start_urls** in **youtube_dl_spider.py** so you crawl what you want.
                                                   
 Because of the large video files which need lots of time to download , so you will see the process seems to be stuck. If you want to know if the program is running for downloading , you can run **perfmon.exe** in Windows to check the **python.exe** 's traffic.
 
