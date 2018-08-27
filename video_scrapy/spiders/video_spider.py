@@ -9,9 +9,9 @@ from video_scrapy.settings import my_defined_urls
 
 class YoutubeDlSpider(scrapy.Spider):
     name = 'video'
-    start_urls = ['http://www.iqiyi.com/v_19rqyrk8ic.html']
+    start_urls = ['http://www.iqiyi.com/v_19rr2aesjs.html']
     youtube_dl_not_you_get = False
-    get_playlist = False
+    get_playlist = True
     handle_httpstatus_list = [404]
     iqiyi_id = {}
 
@@ -89,7 +89,7 @@ class YoutubeDlSpider(scrapy.Spider):
                                 end = False
                             yield scrapy.Request(url=my_url_dict[j], callback=self.savefile, meta={"name": name, "filetype": filetype, "fileid": j, "id": None, "end": end})
 
-    def check_iqiyi_finish(self, name):
+    def check_iqiyi_has_error(self, name):
         self.iqiyi_id[name].setdefault("get_num", 0)
         if "send_num" in self.iqiyi_id[name]:
             if int(self.iqiyi_id[name]["send_num"]) == int(self.iqiyi_id[name]["get_num"]):
@@ -192,7 +192,7 @@ class YoutubeDlSpider(scrapy.Spider):
                                 name]["error_num"]
                         else:
                             self.iqiyi_id[name]["send_num"] = i - 1
-                        if self.check_iqiyi_finish(name):
+                        if self.check_iqiyi_has_error(name):
                             for k in self.iqiyi_url_process(self.iqiyi_id[name]["url"]):
                                 yield k
                     item = FileItem()
@@ -325,7 +325,7 @@ class YoutubeDlSpider(scrapy.Spider):
                         "error"].remove(int(response.meta["fileid"]))
                 item['content'] = response.body
                 yield item
-            if self.check_iqiyi_finish(response.meta["name"]):
+            if self.check_iqiyi_has_error(response.meta["name"]):
                 for i in self.iqiyi_url_process(self.iqiyi_id[response.meta["name"]]["url"]):
                     yield i
         else:
