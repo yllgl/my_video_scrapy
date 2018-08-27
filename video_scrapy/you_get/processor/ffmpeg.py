@@ -120,7 +120,7 @@ def ffmpeg_concat_ts_to_mkv(files, output='output.mkv'):
     for file in files:
         if os.path.isfile(file):
             params[-1] += file + '|'
-    params += ['-f', 'matroska', '-c', 'copy', output]
+    params += ['-c', 'copy', output]
 
     try:
         if subprocess.call(params, stdin=STDIN) == 0:
@@ -128,6 +128,7 @@ def ffmpeg_concat_ts_to_mkv(files, output='output.mkv'):
         else:
             return False
     except:
+
         return False
 
 def ffmpeg_concat_flv_to_mp4(files, output='output.mp4'):

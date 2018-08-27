@@ -11,7 +11,7 @@ class YoutubeDlSpider(scrapy.Spider):
     name = 'video'
     start_urls = ['http://www.iqiyi.com/v_19rr2aesjs.html']
     youtube_dl_not_you_get = False
-    get_playlist = True
+    get_playlist = False
     handle_httpstatus_list = [404]
     iqiyi_id = {}
 

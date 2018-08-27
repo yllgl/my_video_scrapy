@@ -9,6 +9,28 @@ from video_scrapy.items import *
 from video_scrapy.flvcopycat import process_flv
 from video_scrapy.you_get.processor.join_mp4 import concat_mp4
 from video_scrapy.settings import TEMP_PATH,OUTPUT_PATH
+import subprocess
+from subprocess import DEVNULL
+import sys
+import os
+def get_usable_ffmpeg(cmd):
+    cmd=os.path.dirname(__file__)+"/"+cmd
+    try:
+        p = subprocess.Popen([cmd, '-version'], stdin=DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        vers = str(out, 'utf-8').split('\n')[0].split()
+        assert (vers[0] == 'ffmpeg' and vers[2][0] > '0') or (vers[0] == 'avconv')
+        try:
+            v = vers[2][1:] if vers[2][0] == 'n' else vers[2]
+            version = [int(i) for i in v.split('.')]
+        except:
+            version = [1, 0]
+        return cmd, 'ffprobe', version
+    except:
+        return None
+FFMPEG, FFPROBE, FFMPEG_VERSION = get_usable_ffmpeg('ffmpeg') or get_usable_ffmpeg('avconv') or (None, None, None)
+LOGLEVEL = ['-loglevel', 'info']
+STDIN = None
 class MyFilePipeline(object):
     namedict={}
     enddict={}
@@ -54,39 +76,50 @@ class MyFilePipeline(object):
             self.flv_combine(item)
         elif filetype=="mp4":
             self.mp4_combine(item)
+    def ffmpeg_concat_ts_to_mkv(self,files, output='output.mkv'):
+        print('Merging video parts... ', end="", flush=True)
+        params = [FFMPEG] + LOGLEVEL + ['-isync', '-y', '-i']
+        params.append('concat:')
+        for file in files:
+            if os.path.isfile(file):
+                params[-1] += file + '|'
+        params += ['-c', 'copy', output]
+
+        try:
+            if subprocess.call(params, stdin=STDIN) == 0:
+                return True
+            else:
+                return False
+        except:
+            return False
     def m3u8_combine(self,item):
-        name=item['name']
+        name = item['name']
         if item["id"] is None:
             src = self.root+ name + "." + "ts"
         else:
             src = self.root + "%03d" % int(item["id"]) + "_" + name + "." + "ts"
-        now_id=self.namedict.setdefault(name,1)
-        if now_id==item['fileid']:
-            with open(src,'ab') as f:
-                f.write(item['content'])
-            now_id=now_id+1
-            while True:
-                try:
-                    if name in self.enddict:
-                        if self.enddict[name] == now_id:
-                            self.enddict.pop(name)
-                            self.namedict.pop(name)
-                            print(name + " success")
-                            break
-                    temp_path=self.temp+name+str(now_id)
-                    tempfile=open(temp_path,'rb')
-                    with open(src,'ab') as f:
-                        f.write(tempfile.read())
-                        f.flush()
-                    tempfile.close()
-                    os.remove(temp_path)
-                    now_id=now_id+1
-                except FileNotFoundError:
-                    break
-        else:
-            temp_path=self.temp+name+str(item['fileid'])
-            with open(temp_path, 'wb') as f:
-                f.write(item['content'])
+        now_id = self.namedict.setdefault(name, 1)
+        temp_path = self.temp + name + str(item['fileid'])
+        with open(temp_path, 'wb') as f:
+            f.write(item['content'])
+        while True:
+            temp_path= self.temp + name +"%d"%(now_id)
+            if not os.path.exists(temp_path):
+                break
+            else:
+                now_id=now_id+1
+        if name in self.enddict:
+            if self.enddict[name] == now_id:
+                self.enddict.pop(name)
+                self.namedict.pop(name)
+                temp_path = self.temp + name + "%d"
+                mylist = [temp_path % (x) for x in range(1, now_id)]
+                if self.ffmpeg_concat_ts_to_mkv(mylist,src) is True:
+                    for i in mylist:
+                        os.remove(i)
+                    print(name+" success")
+                else:
+                    print(name+" fail")
         if name in self.namedict:
             self.namedict[name]=now_id
 
