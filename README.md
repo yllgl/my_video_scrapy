@@ -1,7 +1,7 @@
 readme
 =======
 It's a **Python 3** project,I don't know if it can run in Python 2.
-It's a simple **scrapy** project containing youtube-dl  and you-get libraries so that you can crawl videos easily.
+It's a simple **scrapy** project containing ffmpeg tool , youtube-dl  and you-get libraries so that you can crawl videos easily.
 
 If you know how to use scrapy,then you can easily use this project and easily improve the code.
 
