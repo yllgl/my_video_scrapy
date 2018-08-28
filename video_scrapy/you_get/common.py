@@ -1336,118 +1336,120 @@ def script_main(download, download_playlist, **kwargs):
             )
         )
 
-    parser = argparse.ArgumentParser(
-        prog='you-get',
-        usage='you-get [OPTION]... URL...',
-        description='A tiny downloader that scrapes the web',
-        add_help=False,
-    )
-    parser.add_argument(
-        '-V', '--version', action='store_true',
-        help='Print version and exit'
-    )
-    parser.add_argument(
-        '-h', '--help', action='store_true',
-        help='Print this help message and exit'
-    )
+    # parser = argparse.ArgumentParser(
+    #     prog='you-get',
+    #     usage='you-get [OPTION]... URL...',
+    #     description='A tiny downloader that scrapes the web',
+    #     add_help=False,
+    # )
+    # parser.add_argument(
+    #     '-V', '--version', action='store_true',
+    #     help='Print version and exit'
+    # )
+    # parser.add_argument(
+    #     '-h', '--help', action='store_true',
+    #     help='Print this help message and exit'
+    # )
 
-    dry_run_grp = parser.add_argument_group(
-        'Dry-run options', '(no actual downloading)'
-    )
-    dry_run_grp = dry_run_grp.add_mutually_exclusive_group()
-    dry_run_grp.add_argument(
-        '-i', '--info', action='store_true', help='Print extracted information'
-    )
-    dry_run_grp.add_argument(
-        '-u', '--url', action='store_true',
-        help='Print extracted information with URLs'
-    )
-    dry_run_grp.add_argument(
-        '--json', action='store_true',
-        help='Print extracted URLs in JSON format'
-    )
+    # dry_run_grp = parser.add_argument_group(
+    #     'Dry-run options', '(no actual downloading)'
+    # )
+    # dry_run_grp = dry_run_grp.add_mutually_exclusive_group()
+    # dry_run_grp.add_argument(
+    #     '-i', '--info', action='store_true', help='Print extracted information'
+    # )
+    # dry_run_grp.add_argument(
+    #     '-u', '--url', action='store_true',
+    #     help='Print extracted information with URLs'
+    # )
+    # dry_run_grp.add_argument(
+    #     '--json', action='store_true',
+    #     help='Print extracted URLs in JSON format'
+    # )
 
-    download_grp = parser.add_argument_group('Download options')
-    download_grp.add_argument(
-        '-n', '--no-merge', action='store_true', default=False,
-        help='Do not merge video parts'
-    )
-    download_grp.add_argument(
-        '--no-caption', action='store_true',
-        help='Do not download captions (subtitles, lyrics, danmaku, ...)'
-    )
-    download_grp.add_argument(
-        '-f', '--force', action='store_true', default=False,
-        help='Force overwriting existing files'
-    )
-    download_grp.add_argument(
-        '-F', '--format', metavar='STREAM_ID',
-        help='Set video format to STREAM_ID'
-    )
-    download_grp.add_argument(
-        '-O', '--output-filename', metavar='FILE', help='Set output filename'
-    )
-    download_grp.add_argument(
-        '-o', '--output-dir', metavar='DIR', default='.',
-        help='Set output directory'
-    )
-    download_grp.add_argument(
-        '-p', '--player', metavar='PLAYER',
-        help='Stream extracted URL to a PLAYER'
-    )
-    download_grp.add_argument(
-        '-c', '--cookies', metavar='COOKIES_FILE',
-        help='Load cookies.txt or cookies.sqlite'
-    )
-    download_grp.add_argument(
-        '-t', '--timeout', metavar='SECONDS', type=int, default=600,
-        help='Set socket timeout'
-    )
-    download_grp.add_argument(
-        '-d', '--debug', action='store_true',
-        help='Show traceback and other debug info'
-    )
-    download_grp.add_argument(
-        '-I', '--input-file', metavar='FILE', type=argparse.FileType('r'),
-        help='Read non-playlist URLs from FILE'
-    )
-    download_grp.add_argument(
-        '-P', '--password', help='Set video visit password to PASSWORD'
-    )
-    download_grp.add_argument(
-        '-l', '--playlist', action='store_true',
-        help='Prefer to download a playlist'
-    )
-    download_grp.add_argument(
-        '-a', '--auto-rename', action='store_true', default=False,
-        help='Auto rename same name different files'
-    )
+    # download_grp = parser.add_argument_group('Download options')
+    # download_grp.add_argument(
+    #     '-n', '--no-merge', action='store_true', default=False,
+    #     help='Do not merge video parts'
+    # )
+    # download_grp.add_argument(
+    #     '--no-caption', action='store_true',
+    #     help='Do not download captions (subtitles, lyrics, danmaku, ...)'
+    # )
+    # download_grp.add_argument(
+    #     '-f', '--force', action='store_true', default=False,
+    #     help='Force overwriting existing files'
+    # )
+    # download_grp.add_argument(
+    #     '-F', '--format', metavar='STREAM_ID',
+    #     help='Set video format to STREAM_ID'
+    # )
+    # download_grp.add_argument(
+    #     '-O', '--output-filename', metavar='FILE', help='Set output filename'
+    # )
+    # download_grp.add_argument(
+    #     '-o', '--output-dir', metavar='DIR', default='.',
+    #     help='Set output directory'
+    # )
+    # download_grp.add_argument(
+    #     '-p', '--player', metavar='PLAYER',
+    #     help='Stream extracted URL to a PLAYER'
+    # )
+    # download_grp.add_argument(
+    #     '-c', '--cookies', metavar='COOKIES_FILE',
+    #     help='Load cookies.txt or cookies.sqlite'
+    # )
+    # download_grp.add_argument(
+    #     '-t', '--timeout', metavar='SECONDS', type=int, default=600,
+    #     help='Set socket timeout'
+    # )
+    # download_grp.add_argument(
+    #     '-d', '--debug', action='store_true',
+    #     help='Show traceback and other debug info'
+    # )
+    # download_grp.add_argument(
+    #     '-I', '--input-file', metavar='FILE', type=argparse.FileType('r'),
+    #     help='Read non-playlist URLs from FILE'
+    # )
+    # download_grp.add_argument(
+    #     '-P', '--password', help='Set video visit password to PASSWORD'
+    # )
+    # download_grp.add_argument(
+    #     '-l', '--playlist', action='store_true',
+    #     help='Prefer to download a playlist'
+    # )
+    # download_grp.add_argument(
+    #     '-a', '--auto-rename', action='store_true', default=False,
+    #     help='Auto rename same name different files'
+    # )
 
-    proxy_grp = parser.add_argument_group('Proxy options')
-    proxy_grp = proxy_grp.add_mutually_exclusive_group()
-    proxy_grp.add_argument(
-        '-x', '--http-proxy', metavar='HOST:PORT',
-        help='Use an HTTP proxy for downloading'
-    )
-    proxy_grp.add_argument(
-        '-y', '--extractor-proxy', metavar='HOST:PORT',
-        help='Use an HTTP proxy for extracting only'
-    )
-    proxy_grp.add_argument(
-        '--no-proxy', action='store_true', help='Never use a proxy'
-    )
-    proxy_grp.add_argument(
-        '-s', '--socks-proxy', metavar='HOST:PORT',
-        help='Use an SOCKS5 proxy for downloading'
-    )
+    # proxy_grp = parser.add_argument_group('Proxy options')
+    # proxy_grp = proxy_grp.add_mutually_exclusive_group()
+    # proxy_grp.add_argument(
+    #     '-x', '--http-proxy', metavar='HOST:PORT',
+    #     help='Use an HTTP proxy for downloading'
+    # )
+    # proxy_grp.add_argument(
+    #     '-y', '--extractor-proxy', metavar='HOST:PORT',
+    #     help='Use an HTTP proxy for extracting only'
+    # )
+    # proxy_grp.add_argument(
+    #     '--no-proxy', action='store_true', help='Never use a proxy'
+    # )
+    # proxy_grp.add_argument(
+    #     '-s', '--socks-proxy', metavar='HOST:PORT',
+    #     help='Use an SOCKS5 proxy for downloading'
+    # )
 
-    download_grp.add_argument('--stream', help=argparse.SUPPRESS)
-    download_grp.add_argument('--itag', help=argparse.SUPPRESS)
+    # download_grp.add_argument('--stream', help=argparse.SUPPRESS)
+    # download_grp.add_argument('--itag', help=argparse.SUPPRESS)
 
-    parser.add_argument('URL', nargs='*', help=argparse.SUPPRESS)
-
-    args = parser.parse_args()
-
+    # parser.add_argument('URL', nargs='*', help=argparse.SUPPRESS)
+    from argparse import Namespace
+    args = Namespace(help=False,version=False,debug=False,
+        output_filename=None,extractor_proxy=None,info=False,force=False,auto_rename=False,url=True,json=False,cookies=None,format=None,
+        stream=None,itag=None,no_caption=False,player=None,no_proxy=False,http_proxy=None,socks_proxy=None,input_file=None,playlist=False,timeout=600,output_dir='.',no_merge=False,password=None,)
+    args
     if args.help:
         print_version()
         parser.print_help()
