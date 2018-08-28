@@ -53,6 +53,21 @@ class MyFilePipeline(object):
             os.mkdir(self.temp)
     def process_item(self, item, spider):
         if isinstance(item,FileItem):
+            try:
+                spider.state
+                try:
+                    if "namedict" in spider.state:
+                        self.namedict = spider.state["namedict"]
+                    else:
+                        spider.state["namedict"]=self.namedict
+                    if "enddict" in spider.state:
+                        self.enddict = spider.state["enddict"]
+                    else:
+                        spider.state["enddict"]=self.enddict
+                except:
+                	pass
+            except:
+                pass
             name=item['name']
             if item["end"] is True:
                 self.enddict.setdefault(name, int(item['fileid']) + 1)
@@ -120,6 +135,13 @@ class MyFilePipeline(object):
                     print(name+" success")
                 else:
                     print(name+" fail")
+                    import datetime
+                    nowTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    with open("error.txt", "a") as f:
+                        f.write('\n')
+                        f.write(str(nowTime))
+                        f.write("\ncan't merge video for  %s"%name)
+                        f.write('\n')
         if name in self.namedict:
             self.namedict[name]=now_id
 

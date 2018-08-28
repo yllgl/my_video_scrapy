@@ -9,87 +9,123 @@ from video_scrapy.settings import my_defined_urls
 
 class YoutubeDlSpider(scrapy.Spider):
     name = 'video'
-    start_urls = ['http://www.iqiyi.com/v_19rr2aesjs.html']
     youtube_dl_not_you_get = False
-    get_playlist = False
     handle_httpstatus_list = [404]
-    iqiyi_id = {}
-
-    def start_requests(self):
-        if self.youtube_dl_not_you_get:
-            parameter = ['-g', "--rm-cache-dir"]
-            for i in self.start_urls:
-                if "bilibili" in i:
-                    yield scrapy.Request(url=i, callback=self.bili_parse)
-                else:
-                    parameter.append(i)
-            if len(parameter) == 2:
-                pass
-            else:
-                # from video_scrapy.youtube_dl.YoutubeDL import my_defined_urls
-                from video_scrapy.youtube_dl import main
-                print("waiting for youtube_dl get urls")
-                main(parameter)
-                print("get youtube_dl urls")
-                for i in my_defined_urls:
-                    my_url_dict = my_defined_urls[i]
-                    for j in my_url_dict:
-                        name = str(j).rsplit(".", 1)[0]
-                        filetype = str(j).rsplit(".", 1)[-1]
-                        yield scrapy.Request(url=my_url_dict[j], callback=self.savefile, meta={"name": name, "filetype": filetype, "fileid": None, "id": None, "end": None})
+    def __init__(self, my_url=None, my_playlist=False,*args, **kwargs):
+        super(YoutubeDlSpider, self).__init__(*args, **kwargs)
+        if my_url is None:
+            self.start_urls = []
         else:
-            iqiyi_url = []
-            for i in self.start_urls:
-                if "bilibili" in i:
-                    yield scrapy.Request(url=i, callback=self.bili_parse)
-                    self.start_urls.remove(i)
-                elif "iqiyi.com" in i:
-                    iqiyi_url.append(i)
-                    self.start_urls.remove(i)
-            if len(iqiyi_url) == 0:
-                pass
+            self.start_urls = ["%s"%my_url]
+        if isinstance(my_playlist, str):
+            if my_playlist=="True":
+                my_playlist=True
             else:
-                for i in self.iqiyi_url_process(iqiyi_url):
-                    yield i
-            if len(self.start_urls) == 0:
-                pass
-            else:
-                from video_scrapy.you_get.common import main
-                # from video_scrapy.you_get import common
-                print("waiting for you_get get urls")
-                main(my_own_urls=self.start_urls,
-                     my_own_playlist=self.get_playlist)
-                print("get you_get urls finish")
-                if "error" in my_defined_urls:
-                    print(
-                        "can't get urls for some videos,please look at error.txt for more information!")
-                    error = my_defined_urls.pop("error")
-                    import datetime
-                    nowTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    with open("error.txt", "a") as f:
-                        f.write('\n')
-                        f.write(nowTime)
-                        f.write('\n')
-                        f.write("\n".join(error))
-                for i in my_defined_urls:
-                    my_url_dict = my_defined_urls[i]
-                    name = i
-                    filetype = my_url_dict.pop("filetype")
-                    end_id = len(my_url_dict)
-                    if end_id == 1:
-                        url = my_url_dict.popitem()[1]
-                        filetype = re.search(r"\.(\w+?)\?", url).group(1)
-                        if filetype == "m3u8":
-                            yield scrapy.Request(url=url, callback=self.parse_m3u8, meta={"name": name})
+                my_playlist=False
+        self.get_playlist=my_playlist
+    def start_requests(self):
+        try:
+            self.state
+            try:
+                if "iqiyi_id" in self.state:
+                    self.iqiyi_id = self.state["iqiyi_id"]
+                else:
+                    self.iqiyi_id
+            except:
+                self.iqiyi_id = {}
+                self.state["iqiyi_id"] = self.iqiyi_id
+        except:
+            self.iqiyi_id = {}
+        if len(self.iqiyi_id)==0:
+            if self.youtube_dl_not_you_get:
+                parameter = ['-g', "--rm-cache-dir"]
+                for i in self.start_urls:
+                    if "bilibili" in i:
+                        yield scrapy.Request(url=i, callback=self.bili_parse)
                     else:
+                        parameter.append(i)
+                if len(parameter) == 2:
+                    pass
+                else:
+                    # from video_scrapy.youtube_dl.YoutubeDL import my_defined_urls
+                    from video_scrapy.youtube_dl import main
+                    print("waiting for youtube_dl get urls")
+                    main(parameter)
+                    print("get youtube_dl urls")
+                    for i in my_defined_urls:
+                        my_url_dict = my_defined_urls[i]
                         for j in my_url_dict:
-                            if int(j) == int(end_id):
-                                end = True
-                            else:
-                                end = False
-                            yield scrapy.Request(url=my_url_dict[j], callback=self.savefile, meta={"name": name, "filetype": filetype, "fileid": j, "id": None, "end": end})
+                            name = str(j).rsplit(".", 1)[0]
+                            filetype = str(j).rsplit(".", 1)[-1]
+                            yield scrapy.Request(url=my_url_dict[j], callback=self.savefile, meta={"name": name, "filetype": filetype, "fileid": None, "id": None, "end": None})
+            else:
+                iqiyi_url = []
+                for i in self.start_urls:
+                    if "bilibili" in i:
+                        yield scrapy.Request(url=i, callback=self.bili_parse)
+                        self.start_urls.remove(i)
+                    elif "iqiyi.com" in i:
+                        iqiyi_url.append(i)
+                        self.start_urls.remove(i)
+                if len(iqiyi_url) == 0:
+                    pass
+                else:
+                    for i in self.iqiyi_url_process(iqiyi_url):
+                        yield i
+                if len(self.start_urls) == 0:
+                    pass
+                else:
+                    from video_scrapy.you_get.common import main
+                    # from video_scrapy.you_get import common
+                    print("waiting for you_get get urls")
+                    main(my_own_urls=self.start_urls,
+                         my_own_playlist=self.get_playlist)
+                    print("get you_get urls finish")
+                    if "error" in my_defined_urls:
+                        print(
+                            "can't get urls for some videos,please look at error.txt for more information!")
+                        error = my_defined_urls.pop("error")
+                        import datetime
+                        nowTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        with open("error.txt", "a") as f:
+                            f.write('\n')
+                            f.write(str(nowTime))
+                            f.write('\n')
+                            f.write("\n".join(error))
+                    for i in my_defined_urls:
+                        my_url_dict = my_defined_urls[i]
+                        name = i
+                        filetype = my_url_dict.pop("filetype")
+                        end_id = len(my_url_dict)
+                        if end_id == 1:
+                            url = my_url_dict.popitem()[1]
+                            filetype = re.search(r"\.(\w+?)\?", url).group(1)
+                            if filetype == "m3u8":
+                                yield scrapy.Request(url=url, callback=self.parse_m3u8, meta={"name": name})
+                        else:
+                            for j in my_url_dict:
+                                if int(j) == int(end_id):
+                                    end = True
+                                else:
+                                    end = False
+                                yield scrapy.Request(url=my_url_dict[j], callback=self.savefile, meta={"name": name, "filetype": filetype, "fileid": j, "id": None, "end": end})
+        else:
+            pass
 
     def check_iqiyi_has_error(self, name):
+        try:
+            self.state
+            try:
+                if "iqiyi_id" in self.state:
+                    self.iqiyi_id = self.state["iqiyi_id"]
+                else:
+                    self.iqiyi_id
+            except:
+                self.iqiyi_id = {}
+                self.state["iqiyi_id"] = self.iqiyi_id
+        except:
+            self.iqiyi_id = {}
+        print(self.iqiyi_id)
         self.iqiyi_id[name].setdefault("get_num", 0)
         if "send_num" in self.iqiyi_id[name]:
             if int(self.iqiyi_id[name]["send_num"]) == int(self.iqiyi_id[name]["get_num"]):
@@ -104,6 +140,18 @@ class YoutubeDlSpider(scrapy.Spider):
         return False
 
     def iqiyi_url_process(self, my_iqiyi_url):
+        try:
+            self.state
+            try:
+                if "iqiyi_id" in self.state:
+                    self.iqiyi_id = self.state["iqiyi_id"]
+                else:
+                    self.iqiyi_id
+            except:
+                self.iqiyi_id = {}
+                self.state["iqiyi_id"] = self.iqiyi_id
+        except:
+            self.iqiyi_id = {}
         print("waiting for you_get get iqiyi_urls")
         from video_scrapy.you_get.common import main
         for iqiyi_url in my_iqiyi_url:
@@ -119,7 +167,7 @@ class YoutubeDlSpider(scrapy.Spider):
                 nowTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 with open("error.txt", "a") as f:
                     f.write('\n')
-                    f.write(nowTime)
+                    f.write(str(nowTime))
                     f.write('\n')
                     f.write("\n".join(error))
             my_temp = list(my_defined_urls.keys())
@@ -144,6 +192,18 @@ class YoutubeDlSpider(scrapy.Spider):
                 my_defined_urls.pop(i)
 
     def parse_m3u8(self, response):
+        try:
+            self.state
+            try:
+                if "iqiyi_id" in self.state:
+                    self.iqiyi_id = self.state["iqiyi_id"]
+                else:
+                    self.iqiyi_id
+            except:
+                self.iqiyi_id = {}
+                self.state["iqiyi_id"] = self.iqiyi_id
+        except:
+            self.iqiyi_id = {}
         url = response.url
         name = response.meta['name']
         if isinstance(response.body, bytes):
@@ -212,6 +272,18 @@ class YoutubeDlSpider(scrapy.Spider):
         pass
 
     def bili_parse(self, response):
+        try:
+            self.state
+            try:
+                if "iqiyi_id" in self.state:
+                    self.iqiyi_id = self.state["iqiyi_id"]
+                else:
+                    self.iqiyi_id
+            except:
+                self.iqiyi_id = {}
+                self.state["iqiyi_id"] = self.iqiyi_id
+        except:
+            self.iqiyi_id = {}
         if isinstance(response.body, bytes):
             file = str(response.body.decode("utf8"))
         else:
@@ -259,6 +331,18 @@ class YoutubeDlSpider(scrapy.Spider):
                     pass
 
     def bili_get_json(self, response):
+        try:
+            self.state
+            try:
+                if "iqiyi_id" in self.state:
+                    self.iqiyi_id = self.state["iqiyi_id"]
+                else:
+                    self.iqiyi_id
+            except:
+                self.iqiyi_id = {}
+                self.state["iqiyi_id"] = self.iqiyi_id
+        except:
+            self.iqiyi_id = {}
         if isinstance(response.body, bytes):
             temp_dict = json.loads(response.body.decode("utf8"))
         else:
@@ -292,6 +376,18 @@ class YoutubeDlSpider(scrapy.Spider):
                                      meta={"name": response.meta["name"], "id": response.meta["id"], "filetype": filetype, "fileid": fileid, "end": end})
 
     def savefile(self, response):
+        try:
+            self.state
+            try:
+                if "iqiyi_id" in self.state:
+                    self.iqiyi_id = self.state["iqiyi_id"]
+                else:
+                    self.iqiyi_id
+            except:
+                self.iqiyi_id = {}
+                self.state["iqiyi_id"] = self.iqiyi_id
+        except:
+            self.iqiyi_id = {}
         item = FileItem()
         if response.meta['fileid'] is None and response.meta['end'] is None:
             print("get %s" % (response.meta['name']))
