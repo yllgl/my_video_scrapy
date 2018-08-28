@@ -23,5 +23,5 @@ goto end
 scrapy crawl video -a my_url=%url% -a my_playlist=False -s JOBDIR=crawls/video_spider_temp -s LOG_FILE=scrapy.log
 goto end
 :end
-echo good bye
+echo good bye£¡
 pause
