@@ -27,5 +27,3 @@ Remember to change the **start_urls** in **video_spider.py** so you crawl what y
                                                   
 Because of the large video files which need lots of time to download , so you will see the process seems to be stuck. If you want to know if the program is running for downloading , you can run **perfmon.exe** in Windows to check the **python.exe** 's traffic.
 
-下载视频.bat 由于github会自动将编码转换为utf-8，而Windows的cmd是采用ANSI编码的，所以不能直接运行，会出现乱码。
-解决办法是复制bat文件的内容，重新保存成ANSI编码的bat文件才可以运行。（注：bat文件其实就是文本文件）
